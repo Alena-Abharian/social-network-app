@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  StyleSheet,
   Text,
   View,
   ImageBackground,
@@ -11,7 +10,9 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
-import { Input } from "../Components/Input";
+import { styles } from "./LoginScreen.styled";
+
+import { Input } from "../../Components/Input";
 
 const initialState = {
   email: "",
@@ -61,7 +62,7 @@ export const LoginScreen = () => {
     <TouchableWithoutFeedback onPress={keyboardHide}>
       <View style={styles.container}>
         <ImageBackground
-          source={require("../assets/images/photo.jpg")}
+          source={require("../../assets/images/photo.jpg")}
           style={styles.image}
         >
           <KeyboardAvoidingView
@@ -73,13 +74,12 @@ export const LoginScreen = () => {
               <View
                 style={{
                   ...styles.form,
-                  paddingBottom: isShowKeyboard ? 25 : 45,
+                  paddingBottom: isShowKeyboard ? 15 : 45,
                   width: dimensions,
                 }}
               >
                 <Input
                   name="email"
-                  view={{ style: { marginTop: 16 } }}
                   placeholder="Адрес электронной почты"
                   state={state.email}
                   setState={setState}
@@ -97,7 +97,7 @@ export const LoginScreen = () => {
                 />
 
                 <TouchableOpacity
-                  style={{ position: "absolute", right: 16, top: 99 }}
+                  style={{ position: "absolute", right: 16, top: 82 }}
                   onPress={onShow}
                   activeOpacity={0.7}
                 >
@@ -125,57 +125,3 @@ export const LoginScreen = () => {
     </TouchableWithoutFeedback>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  image: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "flex-end",
-  },
-  form: {},
-  btn: {
-    backgroundColor: "#FF6C00",
-    height: 51,
-    borderRadius: 100,
-    marginTop: 43,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  btnTitle: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-  },
-  btnSecond: {
-    marginTop: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  btnSecondTitle: {
-    color: "#1B4371",
-    fontSize: 16,
-    fontFamily: "Roboto-Regular",
-  },
-  box: {
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    paddingTop: 32,
-    alignItems: "center",
-  },
-  boxTitle: {
-    fontSize: 30,
-    fontFamily: "Roboto-Medium",
-    textAlign: "center",
-    marginBottom: 32,
-  },
-  buttonShow: {
-    fontFamily: "Roboto-Regular",
-    fontSize: 16,
-    lineHeight: 19,
-    color: "#1B4371",
-  },
-});
