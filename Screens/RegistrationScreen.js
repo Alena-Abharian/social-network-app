@@ -40,6 +40,16 @@ export const RegistrationScreen = () => {
     };
   }, []);
 
+  useEffect(() => {
+    Keyboard.addListener("keyboardDidHide", () => {
+      setIsShowKeyboard(false);
+      Keyboard.dismiss();
+    });
+    return () => {
+      Keyboard.removeAllListeners("keyboardDidHide");
+    };
+  }, []);
+
   const onShow = () => onShowPass((prevShow) => !prevShow);
 
   const keyboardHide = () => {
@@ -75,7 +85,7 @@ export const RegistrationScreen = () => {
               <View
                 style={{
                   ...styles.form,
-                  paddingBottom: isShowKeyboard ? 25 : 45,
+                  paddingBottom: isShowKeyboard ? 15 : 45,
                   width: dimensions,
                 }}
               >
@@ -167,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6C00",
     height: 51,
     borderRadius: 100,
-    marginTop: 43,
+    marginTop: 30,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -190,14 +200,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    paddingTop: 92,
+    paddingTop: 75,
     alignItems: "center",
   },
   boxTitle: {
     fontSize: 30,
     fontFamily: "Roboto-Medium",
     textAlign: "center",
-    marginBottom: 32,
+    marginBottom: 25,
   },
   buttonShow: {
     fontFamily: "Roboto-Regular",

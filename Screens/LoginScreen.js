@@ -37,6 +37,16 @@ export const LoginScreen = () => {
     };
   }, []);
 
+  useEffect(() => {
+    Keyboard.addListener("keyboardDidHide", () => {
+      setIsShowKeyboard(false);
+      Keyboard.dismiss();
+    });
+    return () => {
+      Keyboard.removeAllListeners("keyboardDidHide");
+    };
+  }, []);
+
   const onShow = () => onShowPass((prevShow) => !prevShow);
 
   const keyboardHide = () => {
