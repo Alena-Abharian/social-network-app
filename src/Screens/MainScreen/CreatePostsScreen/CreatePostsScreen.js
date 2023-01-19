@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ScrollView,
   View,
   TextInput,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
   Text,
   TouchableOpacity,
   Dimensions,
   Image,
 } from "react-native";
+import { Camera } from "expo-camera";
+import * as Location from "expo-location";
 
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 import { styles } from "./CreatePostsScreen.styled";
@@ -21,6 +25,13 @@ const initialState = {
 
 export const CreatePostsScreen = ({ navigation }) => {
   const [state, setState] = useState(initialState);
+  const [camera, setCamera] = useState(null);
+  const [locationCoords, setLocationCoords] = useState(null);
+
+  const locationRef = useRef();
+
+  const [isKeyboardShown, setIsKeyboardShown] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const [windowWidth, setWindowWidth] = useState(
     Dimensions.get("window").width
@@ -35,17 +46,85 @@ export const CreatePostsScreen = ({ navigation }) => {
     return () => dimensionsHandler.remove();
   }, []);
 
-  const onFormSubmit = () => {
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setIsKeyboardShown(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setIsKeyboardShown(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      setLocationCoords(coords);
+    })();
+  }, []);
+
+  const getLocation = async () => {
+    const photoPlace = await Location.reverseGeocodeAsync(locationCoords);
+    const placeLocation = {
+      ...locationCoords,
+      place: `${photoPlace[0].region}, ${photoPlace[0].country}`,
+    };
+    handlerChangeText(placeLocation, "photoLocation");
+  };
+
+  const takePhoto = async () => {
+    const photo = await camera.takePictureAsync();
+    getLocation();
+    setState((prevState) => ({ ...prevState, photoUri: photo.uri }));
+    if (state.photoLocation && state.photoName) {
+      setIsDisabled(false);
+    }
+  };
+
+  const handlerChangeText = (value, inputName) => {
+    setState((prevState) => ({ ...prevState, [inputName]: value }));
+    if (inputName === "photoName") {
+      if (state.photoLocation && state.photoUri && value) {
+        setIsDisabled(false);
+      }
+    } else {
+      if (state.photoName && state.photoUri) {
+        setIsDisabled(false);
+      }
+    }
+    if (!value) {
+      setIsDisabled(true);
+    }
+  };
+
+  const onFormSubmit = async () => {
     setState(initialState);
-    console.log(state);
+    setIsDisabled(true);
+    Keyboard.dismiss();
+    const post = {
+      title: state.photoName,
+      photo: state.photoUri,
+      location: state.photoLocation,
+    };
+    navigation.navigate("PostsScreen", { post });
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <View style={{ flex: 1 }}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
         <ScrollView>
           {state.photoUri ? (
             <View>
@@ -57,10 +136,19 @@ export const CreatePostsScreen = ({ navigation }) => {
                   style={{
                     width: windowWidth - 16 * 2,
                     height: 240,
-                    borderRadius: 8,
                   }}
                 />
-                <TouchableOpacity style={styles.photoBtn} activeOpacity={0.7}>
+                <TouchableOpacity
+                  style={styles.photoBtn}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setState((prevState) => ({
+                      ...prevState,
+                      photoUri: null,
+                    }));
+                    setIsDisabled(true);
+                  }}
+                >
                   <MaterialIcons name="camera-alt" size={24} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
@@ -71,83 +159,88 @@ export const CreatePostsScreen = ({ navigation }) => {
               <View
                 style={{ ...styles.imgHolder, width: windowWidth - 16 * 2 }}
               >
-                <TouchableOpacity style={styles.cameraBtn} activeOpacity={0.7}>
-                  <MaterialIcons name="camera-alt" size={24} color="#BDBDBD" />
-                </TouchableOpacity>
+                <Camera style={styles.camera} ref={setCamera}>
+                  <TouchableOpacity
+                    style={styles.cameraBtn}
+                    activeOpacity={0.7}
+                    onPress={takePhoto}
+                  >
+                    <MaterialIcons
+                      name="camera-alt"
+                      size={24}
+                      color="#BDBDBD"
+                    />
+                  </TouchableOpacity>
+                </Camera>
               </View>
               <Text style={styles.text}>Загрузите фото</Text>
             </View>
           )}
 
-          <View style={{ marginBottom: 16 }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Название..."
-              value={state.photoName}
-              onChangeText={(value) =>
-                setState((prevState) => ({
-                  ...prevState,
-                  photoName: value,
-                }))
-              }
-            />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <View style={{ marginBottom: 16 }}>
+              <TextInput
+                style={styles.input}
+                placeholder="Название..."
+                value={state.photoName}
+                onSubmitEditing={() => {
+                  locationRef.current.focus();
+                }}
+                onChangeText={(value) => {
+                  handlerChangeText(value, "photoName");
+                }}
+              />
 
-            <View style={styles.locationIcon}>
-              <Feather name="map-pin" size={24} color="#BDBDBD" />
+              <View style={styles.locationIcon}>
+                <Feather name="map-pin" size={24} color="#BDBDBD" />
+              </View>
+              <TextInput
+                ref={locationRef}
+                style={{
+                  ...styles.input,
+                  paddingLeft: 32,
+                }}
+                placeholder="Местность..."
+                value={state.photoLocation?.place}
+                onChangeText={(value) => {
+                  handlerChangeText(value, "photoLocation");
+                }}
+              />
             </View>
-            <TextInput
-              style={{ ...styles.input, paddingLeft: 32 }}
-              placeholder="Местность..."
-              value={state.photoLocation}
-              onChangeText={(value) =>
-                setState((prevState) => ({
-                  ...prevState,
-                  photoLocation: value,
-                }))
-              }
-            />
-          </View>
-          <View style={styles.screenContainer}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={
-                state
-                  ? styles.appButtonContainer
-                  : {
-                      ...styles.appButtonContainer,
-                      backgroundColor: "#F6F6F6",
-                      color: "#BDBDBD",
-                    }
-              }
-              onPress={onFormSubmit}
-            >
-              <Text
-                style={
-                  state
-                    ? styles.appButtonText
-                    : {
-                        ...styles.appButtonText,
-                        color: "#BDBDBD",
-                      }
-                }
-              >
-                Опубликовать
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.delContainer}>
-            <TouchableOpacity
-              style={{
-                alignItems: "center",
-                marginTop: 120,
-              }}
-              activeOpacity={0.7}
-            >
+            <View style={styles.screenContainer}>
+              {!isKeyboardShown && (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={{
+                    ...styles.appButtonContainer,
+                    backgroundColor: isDisabled ? "#F6F6F6" : "#FF6C00",
+                  }}
+                  onPress={() => {
+                    onFormSubmit();
+                  }}
+                  disabled={isDisabled}
+                >
+                  <Text
+                    style={{
+                      ...styles.appButtonText,
+                      color: isDisabled ? "#BDBDBD" : "#FFFFFF",
+                    }}
+                  >
+                    Опубликовать
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </KeyboardAvoidingView>
+          <View style={styles.deliteContainer}>
+            <TouchableOpacity style={styles.deliteBtn} activeOpacity={0.7}>
               <Feather name="trash-2" size={24} color="#BDBDBD" />
             </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
-    </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };

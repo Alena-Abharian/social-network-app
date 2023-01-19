@@ -1,18 +1,47 @@
-import React from "react";
-import { TextInput, StyleSheet, View, Text } from "react-native";
+import { useState, useEffect } from "react";
+import {
+  View,
+  Image,
+  TextInput,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableOpacity,
+} from "react-native";
 
-export const CommentsScreen = () => {
+import { Feather } from "@expo/vector-icons";
+import { styles } from "./CommentsScreen.styled";
+
+export const CommentsScreen = ({ route }) => {
+  // console.log("CommentsScreen", route.params);
+
+  const [photo, setPhoto] = useState(null);
+
+  useEffect(() => {
+    if (route.params) {
+      setPhoto(route.params.uri);
+    }
+  }, [route.params]);
+
   return (
-    <View style={styles.container}>
-      <TextInput>
-        <Text>CommentsScreen</Text>
-      </TextInput>
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : ""}>
+          <Image source={{ uri: photo }} style={styles.photo} />
+
+          <View>
+            <TextInput
+              style={styles.input}
+              placeholder={"Комментировать..."}
+              placeholderTextColor={"#BDBDBD"}
+            />
+            <TouchableOpacity activeOpacity={0.7} style={styles.inputBtn}>
+              <Feather name="arrow-up" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

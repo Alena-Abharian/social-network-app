@@ -2,19 +2,23 @@ import { useState, useEffect } from "react";
 import {
   View,
   Text,
-  ScrollView,
   Image,
   TouchableOpacity,
   Dimensions,
+  FlatList,
 } from "react-native";
 
 import { styles } from "./PostsScreen.styled";
-import { Feather, EvilIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 
-export const PostsScreen = ({ navigation }) => {
+export const PostsScreen = ({ navigation, route }) => {
+  // console.log("PostsScreen", route.params);
+  const [posts, setPosts] = useState([]);
+
   const [windowWidth, setWindowWidth] = useState(
     Dimensions.get("window").width
   );
+
   useEffect(() => {
     const onChange = () => {
       const width = Dimensions.get("window").width;
@@ -24,8 +28,15 @@ export const PostsScreen = ({ navigation }) => {
 
     return () => dimensionsHandler.remove();
   }, []);
+
+  useEffect(() => {
+    if (route.params) {
+      setPosts((prevState) => [...prevState, route.params]);
+    }
+  }, [route.params]);
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.userInfo}>
         <Image
           style={{ marginRight: 8, borderRadius: 16 }}
@@ -40,36 +51,49 @@ export const PostsScreen = ({ navigation }) => {
           </Text>
         </View>
       </View>
-      <View style={{ marginTop: 32 }}>
-        <Image
-          source={require("../../../assets/images/rectangle.jpg")}
-          style={{ ...styles.photo, width: windowWidth - 16 * 2 }}
-        />
-        <Text style={styles.photoText}>Лес</Text>
-        <View style={styles.linksContainer}>
-          <TouchableOpacity
-            style={styles.link}
-            activeOpacity={0.7}
-            onPress={() => {
-              navigation.navigate("CommentsScreen");
-            }}
-          >
-            <Feather name="message-circle" size={24} color="#BDBDBD" />
-            <Text style={{ ...styles.count, marginLeft: 6 }}>8</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.link}
-            activeOpacity={0.7}
-            onPress={() => {
-              navigation.navigate("MapScreen");
-            }}
-          >
-            <Feather name="map-pin" size={24} color="#BDBDBD" />
-            <Text style={styles.locationText}>Ukraine</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+      <FlatList
+        data={posts}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={{ marginTop: 32 }}>
+            <Image
+              source={{ uri: item.post.photo }}
+              style={{ ...styles.photo, width: windowWidth - 16 * 2 }}
+            />
+            <Text style={styles.photoText}>{item.post.title}</Text>
+            <View style={styles.linksContainer}>
+              <TouchableOpacity
+                style={styles.link}
+                activeOpacity={0.7}
+                onPress={() => {
+                  navigation.navigate("CommentsScreen", {
+                    uri: item.post.photo,
+                  });
+                }}
+              >
+                <Feather name="message-circle" size={24} color="#BDBDBD" />
+                <Text style={{ ...styles.count, marginLeft: 6 }}>8</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.link}
+                activeOpacity={0.7}
+                onPress={() => {
+                  navigation.navigate("MapScreen", {
+                    location: item.post.location,
+                  });
+                }}
+              >
+                <Feather name="map-pin" size={24} color="#BDBDBD" />
+                <Text style={styles.locationText}>
+                  {item.post.location.place}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      />
+    </View>
   );
 };

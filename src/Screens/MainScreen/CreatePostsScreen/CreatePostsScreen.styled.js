@@ -6,18 +6,23 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFFFFF",
   },
-  imgHolder: {
+  camera: {
+    height: 240,
+    justifyContent: "center",
     alignItems: "center",
+    borderRadius: 10,
+  },
+  imgHolder: {
     justifyContent: "center",
     height: 240,
     backgroundColor: "#F6F6F6",
     borderColor: "#E8E8E8",
-    borderRadius: 8,
     marginTop: 32,
   },
   photoBtn: {
     position: "absolute",
     bottom: 240 / 2 - 30,
+    left: 320 / 2,
     justifyContent: "center",
     alignItems: "center",
     width: 60,
@@ -26,6 +31,8 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.3)",
   },
   cameraBtn: {
+    position: "absolute",
+    bottom: 240 / 2 - 30,
     justifyContent: "center",
     alignItems: "center",
     width: 60,
@@ -72,5 +79,17 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     alignSelf: "center",
+  },
+  deliteContainer: {
+    alignItems: "center",
+    marginTop: 55,
+  },
+  deliteBtn: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 70,
+    height: 40,
+    backgroundColor: "#F6F6F6",
+    borderRadius: 20,
   },
 });
