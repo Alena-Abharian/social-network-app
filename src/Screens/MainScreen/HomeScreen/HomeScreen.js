@@ -3,6 +3,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { View } from "react-native";
 
+import { useDispatch } from "react-redux";
+import { authSignOutUser } from "../../../redux/auth/authOperations";
+
 import { Feather, Ionicons } from "@expo/vector-icons";
 
 import { NestedScreens } from "../NestedScreens/NestedScreens";
@@ -12,6 +15,7 @@ import { ProfileScreen } from "../ProfileScreen/ProfileScreen";
 const MainTab = createBottomTabNavigator();
 
 export const HomeScreen = ({ navigation, route }) => {
+  const dispatch = useDispatch();
   return (
     <MainTab.Navigator initialRouteName="PostsScreen">
       <MainTab.Screen
@@ -40,7 +44,7 @@ export const HomeScreen = ({ navigation, route }) => {
                 size={24}
                 style={{ marginRight: 10 }}
                 onPress={() => {
-                  console.log("logout");
+                  dispatch(authSignOutUser());
                 }}
               />
             ),

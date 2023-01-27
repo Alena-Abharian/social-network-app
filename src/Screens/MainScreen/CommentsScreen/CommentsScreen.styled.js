@@ -11,7 +11,9 @@ export const styles = StyleSheet.create({
   photo: {
     height: 240,
     marginBottom: 32,
+    borderRadius: 8,
   },
+
   input: {
     height: 50,
     fontFamily: "Roboto-Medium",
@@ -38,5 +40,39 @@ export const styles = StyleSheet.create({
     height: 34,
     borderRadius: 100,
     backgroundColor: "#FF6C00",
+  },
+  commentContainer: {
+    flexDirection: "row",
+    marginBottom: 24,
+  },
+  commentIcon: {
+    width: 28,
+    height: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#1B4371",
+    borderRadius: 14,
+    marginRight: 16,
+    overflow: "hidden",
+  },
+  commentTextContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.03)",
+    padding: 16,
+    borderRadius: 6,
+  },
+  commentText: {
+    fontFamily: "Roboto-Regular",
+    fontSize: 13,
+    lineHeight: 18,
+    color: "#212121",
+    marginBottom: 8,
+  },
+  commentTime: {
+    fontFamily: "Roboto-Regular",
+    fontSize: 10,
+    lineHeight: 12,
+    textAlign: "right",
+    color: "rgba(189, 189, 189, 1)",
   },
 });

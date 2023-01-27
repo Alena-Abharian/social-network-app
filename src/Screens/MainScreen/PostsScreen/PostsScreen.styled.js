@@ -24,6 +24,7 @@ export const styles = StyleSheet.create({
     lineHeight: 19,
     color: "#212121",
     marginBottom: 8,
+    marginTop: 8,
   },
   linksContainer: {
     flexDirection: "row",

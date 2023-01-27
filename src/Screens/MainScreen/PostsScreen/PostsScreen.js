@@ -7,13 +7,17 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { subscribePosts } from "../../../redux/posts/postsOperations";
 
 import { styles } from "./PostsScreen.styled";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 
 export const PostsScreen = ({ navigation, route }) => {
-  // console.log("PostsScreen", route.params);
-  const [posts, setPosts] = useState([]);
+  const user = useSelector((state) => state.auth.user);
+  const posts = useSelector((state) => state.posts.posts);
+
+  const dispatch = useDispatch();
 
   const [windowWidth, setWindowWidth] = useState(
     Dimensions.get("window").width
@@ -30,24 +34,22 @@ export const PostsScreen = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    if (route.params) {
-      setPosts((prevState) => [...prevState, route.params]);
-    }
-  }, [route.params]);
+    dispatch(subscribePosts());
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.userInfo}>
         <Image
-          style={{ marginRight: 8, borderRadius: 16 }}
-          source={require("../../../assets/images/User.jpg")}
+          style={{ marginRight: 8, borderRadius: 16, width: 60, height: 60 }}
+          source={{ uri: user?.avatar }}
         />
         <View>
-          <Text style={{ fontFamily: "Roboto-Medium", fontSize: 13 }}>
-            Natali Romanova
+          <Text style={{ fontFamily: "Roboto-Medium", fontSize: 16 }}>
+            {user?.name}
           </Text>
-          <Text style={{ fontFamily: "Roboto-Regular", fontSize: 11 }}>
-            email@example.com
+          <Text style={{ fontFamily: "Roboto-Regular", fontSize: 12 }}>
+            {user?.email}
           </Text>
         </View>
       </View>
@@ -58,37 +60,37 @@ export const PostsScreen = ({ navigation, route }) => {
         renderItem={({ item }) => (
           <View style={{ marginTop: 32 }}>
             <Image
-              source={{ uri: item.post.photo }}
+              source={{ uri: item.photo }}
               style={{ ...styles.photo, width: windowWidth - 16 * 2 }}
             />
-            <Text style={styles.photoText}>{item.post.title}</Text>
+            <Text style={styles.photoText}>{item.title}</Text>
             <View style={styles.linksContainer}>
               <TouchableOpacity
                 style={styles.link}
                 activeOpacity={0.7}
                 onPress={() => {
                   navigation.navigate("CommentsScreen", {
-                    uri: item.post.photo,
+                    uri: item.photo,
+                    postId: item.id,
                   });
                 }}
               >
-                <Feather name="message-circle" size={24} color="#BDBDBD" />
-                <Text style={{ ...styles.count, marginLeft: 6 }}>8</Text>
+                <FontAwesome5 name="comment-dots" size={25} color="#FF6C00" />
+                <Text style={{ ...styles.count, marginLeft: 6 }}>
+                  {item.comments.length}
+                </Text>
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={styles.link}
                 activeOpacity={0.7}
                 onPress={() => {
                   navigation.navigate("MapScreen", {
-                    location: item.post.location,
+                    location: item.location,
                   });
                 }}
               >
                 <Feather name="map-pin" size={24} color="#BDBDBD" />
-                <Text style={styles.locationText}>
-                  {item.post.location.place}
-                </Text>
+                <Text style={styles.locationText}>{item.location.place}</Text>
               </TouchableOpacity>
             </View>
           </View>

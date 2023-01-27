@@ -3,7 +3,6 @@ import { StyleSheet, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 export const MapScreen = ({ route }) => {
-  // console.log("MapScreen", route.params);
   const [location, setLocation] = useState({});
 
   useEffect(() => {
@@ -26,7 +25,7 @@ export const MapScreen = ({ route }) => {
         mapType="standard"
       >
         <Marker
-          title={location.place}
+          title={location?.place}
           coordinate={{
             latitude: location.latitude,
             longitude: location.longitude,

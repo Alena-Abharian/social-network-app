@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { Provider } from "react-redux";
+import { store } from "./src/redux/store";
 
 import { View } from "react-native";
-import { RegistrationScreen } from "./src/Screens/RegistrationScreen/RegistrationScreen";
 
-import { useRoute } from "./src/router";
+import { Main } from "./src/Components/main";
 
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,8 +12,6 @@ import * as SplashScreen from "expo-splash-screen";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const routing = useRoute(true);
-
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./src/assets/fonts/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./src/assets/fonts/Roboto-Medium.ttf"),
@@ -31,15 +29,10 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer onLayout={onLayoutRootView}>
-      {routing}
-    </NavigationContainer>
+    <Provider store={store}>
+      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <Main />
+      </View>
+    </Provider>
   );
-
-  // return (
-  //   <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-  //     <RegistrationScreen />
-  //     {/* <LoginScreen /> */}
-  //   </View>
-  // );
 }

@@ -10,6 +10,9 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 
+import { useDispatch } from "react-redux";
+import { authSignInUser } from "../../redux/auth/authOperations";
+
 import { styles } from "./LoginScreen.styled";
 
 import { Input } from "../../Components/Input";
@@ -26,6 +29,8 @@ export const LoginScreen = ({ navigation }) => {
   const [dimensions, setDimension] = useState(
     Dimensions.get("window").width - 16 * 2
   );
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const onChange = () => {
@@ -50,12 +55,17 @@ export const LoginScreen = ({ navigation }) => {
 
   const onShow = () => onShowPass((prevShow) => !prevShow);
 
-  const keyboardHide = () => {
+  const handlerSubmit = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
 
+    dispatch(authSignInUser(state));
     setState(initialState);
-    console.log(state);
+  };
+
+  const keyboardHide = () => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
   };
 
   return (
@@ -107,7 +117,7 @@ export const LoginScreen = ({ navigation }) => {
                   <TouchableOpacity
                     style={styles.btn}
                     activeOpacity={0.8}
-                    onPress={keyboardHide}
+                    onPress={handlerSubmit}
                   >
                     <Text style={styles.btnTitle}>Войти</Text>
                   </TouchableOpacity>

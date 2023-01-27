@@ -9,9 +9,18 @@ export const styles = StyleSheet.create({
     resizeMode: "cover",
     justifyContent: "flex-end",
   },
+  postsContainer: {
+    justifyContent: "flex-end",
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    paddingTop: 75,
+    paddingHorizontal: 16,
+    marginTop: 120,
+  },
   avatar: {
     position: "absolute",
-    right: "50%",
+    right: "55%",
     top: 0,
     transform: [{ translateX: 60 }, { translateY: -60 }],
     width: 120,
@@ -37,7 +46,7 @@ export const styles = StyleSheet.create({
     fontSize: 30,
     fontFamily: "Roboto-Medium",
     textAlign: "center",
-    marginBottom: 32,
+    marginBottom: 26,
     color: "#212121",
   },
   logoutBtn: {
@@ -56,6 +65,7 @@ export const styles = StyleSheet.create({
     lineHeight: 19,
     color: "#212121",
     marginBottom: 8,
+    marginTop: 8,
   },
   linksContainer: {
     flexDirection: "row",

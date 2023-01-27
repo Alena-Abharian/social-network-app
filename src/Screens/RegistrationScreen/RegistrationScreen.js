@@ -8,7 +8,12 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   KeyboardAvoidingView,
+  Image,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { authSignUpUser } from "../../redux/auth/authOperations";
+
+import * as ImagePicker from "expo-image-picker";
 
 import { styles } from "./RegistrationScreen.styled";
 
@@ -20,6 +25,7 @@ const initialState = {
   login: "",
   email: "",
   password: "",
+  photoUri: "",
 };
 
 export const RegistrationScreen = ({ navigation }) => {
@@ -29,6 +35,8 @@ export const RegistrationScreen = ({ navigation }) => {
   const [dimensions, setDimension] = useState(
     Dimensions.get("window").width - 16 * 2
   );
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const onChange = () => {
@@ -53,12 +61,34 @@ export const RegistrationScreen = ({ navigation }) => {
 
   const onShow = () => onShowPass((prevShow) => !prevShow);
 
-  const keyboardHide = () => {
+  const photoHandel = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setState((prevstate) => ({
+        ...prevstate,
+        photoUri: result.assets[0].uri,
+      }));
+    }
+  };
+
+  const handlerSubmit = async () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
 
+    dispatch(authSignUpUser(state));
+
     setState(initialState);
-    console.log(state);
+  };
+
+  const keyboardHide = () => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
   };
 
   return (
@@ -74,11 +104,17 @@ export const RegistrationScreen = ({ navigation }) => {
             <View style={styles.box}>
               <Text style={styles.boxTitle}>Регистрация</Text>
               <View style={styles.avatar}>
+                {state.photoUri && (
+                  <Image
+                    source={{ uri: state.photoUri }}
+                    style={{ width: 120, height: 120, borderRadius: 16 }}
+                  />
+                )}
                 <TouchableOpacity
                   style={styles.avatarBtn}
                   activeOpacity={0.7}
                   accessibilityLabel="add avatar"
-                  onPress={() => console.log("add avatar")}
+                  onPress={photoHandel}
                 >
                   <AddAvatar fill={"#FF6C00"} stroke={"#FF6C00"} />
                 </TouchableOpacity>
@@ -128,7 +164,7 @@ export const RegistrationScreen = ({ navigation }) => {
                   <TouchableOpacity
                     style={styles.btn}
                     activeOpacity={0.8}
-                    onPress={keyboardHide}
+                    onPress={handlerSubmit}
                   >
                     <Text style={styles.btnTitle}>Зарегистрироваться</Text>
                   </TouchableOpacity>

@@ -14,8 +14,12 @@ import {
 import { Camera } from "expo-camera";
 import * as Location from "expo-location";
 
+import { useDispatch, useSelector } from "react-redux";
+
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 import { styles } from "./CreatePostsScreen.styled";
+
+import { addPost } from "../../../redux/posts/postsOperations";
 
 const initialState = {
   photoUri: "",
@@ -32,6 +36,9 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
+
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
 
   const [windowWidth, setWindowWidth] = useState(
     Dimensions.get("window").width
@@ -69,8 +76,8 @@ export const CreatePostsScreen = ({ navigation }) => {
 
       let location = await Location.getCurrentPositionAsync({});
       const coords = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: location.coords?.latitude,
+        longitude: location.coords?.longitude,
       };
       setLocationCoords(coords);
     })();
@@ -118,8 +125,15 @@ export const CreatePostsScreen = ({ navigation }) => {
       title: state.photoName,
       photo: state.photoUri,
       location: state.photoLocation,
+      id: user.id,
     };
+    dispatch(addPost(post));
     navigation.navigate("PostsScreen", { post });
+  };
+
+  const handleDelete = () => {
+    setState(initialState);
+    setIsDisabled(true);
   };
 
   return (
@@ -235,7 +249,13 @@ export const CreatePostsScreen = ({ navigation }) => {
             </View>
           </KeyboardAvoidingView>
           <View style={styles.deliteContainer}>
-            <TouchableOpacity style={styles.deliteBtn} activeOpacity={0.7}>
+            <TouchableOpacity
+              style={styles.deliteBtn}
+              activeOpacity={0.7}
+              onPress={() => {
+                handleDelete();
+              }}
+            >
               <Feather name="trash-2" size={24} color="#BDBDBD" />
             </TouchableOpacity>
           </View>
