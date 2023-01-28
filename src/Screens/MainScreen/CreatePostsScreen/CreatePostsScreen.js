@@ -97,7 +97,7 @@ export const CreatePostsScreen = ({ navigation }) => {
     const { status } = await Camera.requestCameraPermissionsAsync();
     if (status !== "granted") return;
     const photo = await camera?.takePictureAsync();
-    getLocation();
+    await getLocation();
     setState((prevState) => ({ ...prevState, photoUri: photo.uri }));
     if (state.photoLocation && state.photoName) {
       setIsDisabled(false);
