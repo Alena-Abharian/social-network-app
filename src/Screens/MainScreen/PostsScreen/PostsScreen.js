@@ -77,7 +77,7 @@ export const PostsScreen = ({ navigation, route }) => {
               >
                 <FontAwesome5 name="comment-dots" size={25} color="#FF6C00" />
                 <Text style={{ ...styles.count, marginLeft: 6 }}>
-                  {item.comments.length}
+                  {item.comments?.length}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -90,7 +90,7 @@ export const PostsScreen = ({ navigation, route }) => {
                 }}
               >
                 <Feather name="map-pin" size={24} color="#BDBDBD" />
-                <Text style={styles.locationText}>{item.location.place}</Text>
+                <Text style={styles.locationText}>{item.location?.place}</Text>
               </TouchableOpacity>
             </View>
           </View>

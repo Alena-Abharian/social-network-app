@@ -93,7 +93,10 @@ export const CreatePostsScreen = ({ navigation }) => {
   };
 
   const takePhoto = async () => {
-    const photo = await camera.takePictureAsync();
+    if (!camera) return;
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    if (status !== "granted") return;
+    const photo = await camera?.takePictureAsync();
     getLocation();
     setState((prevState) => ({ ...prevState, photoUri: photo.uri }));
     if (state.photoLocation && state.photoName) {
